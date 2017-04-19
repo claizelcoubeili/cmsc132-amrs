@@ -9,11 +9,14 @@ import java.util.Random;
 
 public class ARMS {
 	ArrayList<ArrayList<String>> rawInput = new ArrayList<ArrayList<String>>();
+	ArrayList<Instruction> instructions = new ArrayList<Instruction>();
 	int[] integerRegisters;
 	int[] otherRegisters;
+	int rawInputSize;
 
 	public ARMS() {
 		this.readFile("input.txt");
+		this.rawInputSize = this.rawInput.size();
 		System.out.println(rawInput);
 	}
 
@@ -58,6 +61,20 @@ public class ARMS {
 	}
 
 	public void parseInput() {
-		
+		// for each line of instruction from file
+		Instruction temp;
+		int tempSize;
+		for(int i=0; i<this.rawInputSize; i++) {
+			temp = new Instruction();
+			tempSize = this.rawInput.get(i).size();
+
+			for(int j=0; j<tempSize; j++) {
+
+				if(this.rawInput.get(i).get(j).indexOf("LOAD") != -1) {			// load instruction
+
+				}
+
+			}
+		}
 	}
 }

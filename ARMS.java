@@ -6,10 +6,14 @@ import java.util.*;
 import java.awt.*;
 import java.math.*;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ARMS {
 	ArrayList<ArrayList<String>> rawInput = new ArrayList<ArrayList<String>>();
 	ArrayList<Instruction> instructions = new ArrayList<Instruction>();
+	Hashmap<String,String> patterns = new HashMap<String,String>();
+
 	int[] integerRegisters;
 	int[] otherRegisters;
 	int rawInputSize;
@@ -58,6 +62,12 @@ public class ARMS {
 		} catch(Exception e) {
 			System.out.println("Error in reading: "+e.getMessage());
 		}
+	}
+
+	// regex
+	public void loadRegex() {
+		this.patterns.put("LOAD", "");
+
 	}
 
 	public void parseInput() {

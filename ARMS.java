@@ -9,10 +9,12 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class ARMS {
-	ArrayList<ArrayList<String>> rawInput = new ArrayList<ArrayList<String>>();
+	ArrayList<String> rawInput = new ArrayList<String>();
 	ArrayList<Instruction> instructions = new ArrayList<Instruction>();
-	Hashmap<String,String> patterns = new HashMap<String,String>();
+	HashMap<String,String> patterns = new HashMap<String,String>();
+	ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
 
 	int[] integerRegisters;
 	int[] otherRegisters;
@@ -21,12 +23,13 @@ public class ARMS {
 	public ARMS() {
 		this.readFile("input.txt");
 		this.rawInputSize = this.rawInput.size();
-		System.out.println(rawInput);
+
+		this.loadRegex();
+		this.parseInput();
 	}
 
 	public void readFile(String path) {
 		ArrayList<String> tempArray;
-		int count = 0;
 
 		// read file input
 		try {
@@ -34,27 +37,10 @@ public class ARMS {
 			BufferedReader reader = new BufferedReader(new FileReader(path));
 			Scanner scan = new Scanner(System.in);
 
-		// read every line
+			// read every line
 			String tempString;
 			while((line=reader.readLine()) != null) {
-
-				tempString = "";
-				tempArray = new ArrayList<String>();
-				for(int i = 0; i < line.length(); i++) {
-					char c = line.charAt(i);
-					if(c == ' '){
-						tempArray.add(tempString);
-						tempString = "";
-					} else if(i == line.length() - 1) {
-						tempString = tempString + Character.toString(c);
-						tempArray.add(tempString);
-						tempString = "";
-					}else{
-						tempString = tempString + Character.toString(c);
-					}
-				}		
-				this.rawInput.add(tempArray);
-				count++;
+				this.rawInput.add(line);
 			}
 
 		} catch(FileNotFoundException e) {
@@ -66,24 +52,42 @@ public class ARMS {
 
 	// regex
 	public void loadRegex() {
-		this.patterns.put("LOAD", "");
-
+		this.patterns.put("LOAD", "(LOAD) R(\\d+) (\\d+)");
+		this.patterns.put("ADD", "(ADD) R(\\d+) R(\\d+)");
+		this.patterns.put("SUB", "(SUB) R(\\d+) R(\\d+)");
+		this.patterns.put("CMP", "(CMP) R(\\d+) R(\\d+)");
 	}
 
 	public void parseInput() {
 		// for each line of instruction from file
 		Instruction temp;
 		int tempSize;
+		Pattern p;
+		Matcher m;
+
+		// iterate over all instructions and create an instance
 		for(int i=0; i<this.rawInputSize; i++) {
-			temp = new Instruction();
-			tempSize = this.rawInput.get(i).size();
 
-			for(int j=0; j<tempSize; j++) {
+			// check for all 
+			for(String pattern : patterns.values()) {
+				p = Pattern.compile(pattern);
+				m = p.matcher(this.rawInput.get(i));
 
-				if(this.rawInput.get(i).get(j).indexOf("LOAD") != -1) {			// load instruction
+				// compare pattern to 
+				this.instructions.add(new Instruction(m.group(1), m.group(2), m.group(3)));
+			}
+		}
+	}
 
-				}
+	public void execute() {
+		int i, j;
+		int sizeHolder;
 
+		for(i=0; i<rawInputSize; i++) {
+			this.table.add(new ArrayList<String>());
+			sizeHolder = this.table.get(i).size();
+			for(j=0; j<=sizeHolder; j++) {
+				if(sizeHolder)
 			}
 		}
 	}

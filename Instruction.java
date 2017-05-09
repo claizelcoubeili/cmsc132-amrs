@@ -26,16 +26,16 @@ public class Instruction {
 		}
 	}
 
-	public void loadInstruction() {
+	public static void loadInstruction() {
 			
 	}
 
-	public void addInstruction() {
+	public static void addInstruction() {
 	}
 
-	public void subInstruction() {
+	public static void subInstruction() {
 	}
 
-	public void cmpInstruction() {
+	public static void cmpInstruction() {
 	}
 }

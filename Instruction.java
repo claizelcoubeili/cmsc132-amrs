@@ -66,7 +66,7 @@ public class Instruction {
 			}
 		
 	}
-
+  
 	public void addInstruction(int index) {
 	
 				for (int i=0;i<index;i++) {
@@ -156,6 +156,5 @@ public class Instruction {
 						}
 			
 				}
-				
-	}
+    }
 }

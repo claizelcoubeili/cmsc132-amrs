@@ -10,19 +10,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class ARMS {
+public class AMRS {
 	ArrayList<String> rawInput = new ArrayList<String>();
 	ArrayList<Instruction> instructions = new ArrayList<Instruction>();
 	HashMap<String,String> patterns = new HashMap<String,String>();
 	ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
 
-	int[] integerRegisters;
-	int[] otherRegisters;
-	int rawInputSize;
+	int[] integerRegisters; // PC, MAR, MBR, OF, NF, ZF 
+	int[] otherRegisters = new int[6];
+	int noOfInst;
+	int cpuCycle = 0;
 
-	public ARMS() {
+	public AMRS() {
 		this.readFile("input.txt");
-		this.rawInputSize = this.rawInput.size();
+		this.noOfInst = this.rawInput.size();
 
 		this.loadRegex();
 		this.parseInput();
@@ -66,29 +67,53 @@ public class ARMS {
 		Matcher m;
 
 		// iterate over all instructions and create an instance
-		for(int i=0; i<this.rawInputSize; i++) {
+		for(int i=0; i<this.noOfInst; i++) {
 
 			// check for all 
 			for(String pattern : patterns.values()) {
 				p = Pattern.compile(pattern);
 				m = p.matcher(this.rawInput.get(i));
 
-				// compare pattern to 
-				this.instructions.add(new Instruction(m.group(1), m.group(2), m.group(3)));
+				try {
+					// compare pattern to 
+					this.instructions.add(new Instruction(m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3))));
+					continue;
+				} catch (Exception e) {}
+
+				System.out.println("Syntax error!");
 			}
+		}
+
+		
+	}
+
+
+	public void initializeTable() {
+		for(int i=0; i<noOfInst; i++) {
+			this.table.add(new ArrayList<String>());
 		}
 	}
 
 	public void execute() {
 		int i, j;
 		int sizeHolder;
-
-		for(i=0; i<rawInputSize; i++) {
-			this.table.add(new ArrayList<String>());
-			sizeHolder = this.table.get(i).size();
-			for(j=0; j<=sizeHolder; j++) {
-				if(sizeHolder)
+		
+		this.otherRegisters[0] = 0; // set PC to 1st instruction
+		this.cpuCycle = 0;
+		while(true) {
+			while(this.otherRegisters[0] < noOfInst) {
+				if(this.instructions.get(this.otherRegisters[0]).instruction == "LOAD") {
+					Instruction.loadInstruction();
+				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "ADD") {
+					Instruction.addInstruction();
+				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "SUB") {
+					Instruction.subInstruction();
+				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "CMP") {
+					Instruction.cmpInstruction();
+				}
 			}
+
+			this.cpuCycle++;
 		}
 	}
 }

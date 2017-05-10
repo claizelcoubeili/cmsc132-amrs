@@ -74,10 +74,17 @@ public class AMRS {
 				p = Pattern.compile(pattern);
 				m = p.matcher(this.rawInput.get(i));
 
-				// compare pattern to 
-				this.instructions.add(new Instruction(m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3))));
+				try {
+					// compare pattern to 
+					this.instructions.add(new Instruction(m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3))));
+					continue;
+				} catch (Exception e) {}
+
+				System.out.println("Syntax error!");
 			}
 		}
+
+		
 	}
 
 

@@ -22,7 +22,7 @@ public class AMRS {
 	int cpuCycle = 0;
 
 	public AMRS() {
-		this.readFile("input.txt");
+		this.readFile("../input/input.txt");
 		this.noOfInst = this.rawInput.size();
 
 		this.loadRegex();
@@ -82,9 +82,11 @@ public class AMRS {
 
 				System.out.println("Syntax error!");
 			}
+
+			System.out.println(this.instructions.get(i).instruction);
 		}
 
-		
+
 	}
 
 
@@ -101,16 +103,25 @@ public class AMRS {
 		this.otherRegisters[0] = 0; // set PC to 1st instruction
 		this.cpuCycle = 0;
 		while(true) {
-			while(this.otherRegisters[0] < noOfInst) {
-				if(this.instructions.get(this.otherRegisters[0]).instruction == "LOAD") {
-					Instruction.loadInstruction();
+			for(i=0; i<this.noOfInst; i++) {
+				if(this.instructions.get(i).instruction == "LOAD") {
+
+					this.instructions.get(i).loadInstruction(this);
+
 				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "ADD") {
-					Instruction.addInstruction();
+
+					this.instructions.get(i).addInstruction(this);
+
 				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "SUB") {
-					Instruction.subInstruction();
+
+					this.instructions.get(i).subInstruction(this);
+
 				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "CMP") {
-					Instruction.cmpInstruction();
+
+					this.instructions.get(i).cmpInstruction(this);
+
 				}
+				this.otherRegisters[0]++;
 			}
 
 			this.cpuCycle++;

@@ -16,10 +16,16 @@ public class AMRS {
 	HashMap<String,String> patterns = new HashMap<String,String>();
 	ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
 
-	int[] integerRegisters; // PC, MAR, MBR, OF, NF, ZF 
-	int[] otherRegisters = new int[6];
+	int[] integerRegisters; 
+	int[] otherRegisters = new int[6]; // PC, MAR, MBR, OF, NF, ZF 
 	int noOfInst;
 	int cpuCycle = 0;
+	final int PC = 0;
+	final int MAR = 1;
+	final int MBR = 2;
+	final int OF = 3;
+	final int NF = 4;
+	final int ZF = 5;
 
 	public AMRS() {
 		this.readFile("../input/input.txt");
@@ -27,6 +33,8 @@ public class AMRS {
 
 		this.loadRegex();
 		this.parseInput();
+		this.initializeTable();
+		this.execute();
 	}
 
 	public void readFile(String path) {
@@ -74,21 +82,19 @@ public class AMRS {
 				p = Pattern.compile(pattern);
 				m = p.matcher(this.rawInput.get(i));
 
-				try {
-					// compare pattern to 
+				// compare pattern to 
+				if(m.find()) {
 					this.instructions.add(new Instruction(m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3))));
 					continue;
-				} catch (Exception e) {}
-
-				System.out.println("Syntax error!");
+				}
 			}
-
-			System.out.println(this.instructions.get(i).instruction);
 		}
-
-
+		
+		if(this.instructions.size() != this.noOfInst) {
+			System.out.println("Syntax Error! Check your input then try again.");
+			System.exit(0);
+		}
 	}
-
 
 	public void initializeTable() {
 		for(int i=0; i<noOfInst; i++) {
@@ -99,32 +105,44 @@ public class AMRS {
 	public void execute() {
 		int i, j;
 		int sizeHolder;
-		
-		this.otherRegisters[0] = 0; // set PC to 1st instruction
+
+		this.otherRegisters[this.PC] = 0; // set PC to 1st instruction
 		this.cpuCycle = 0;
+
 		while(true) {
 			for(i=0; i<this.noOfInst; i++) {
-				if(this.instructions.get(i).instruction == "LOAD") {
-
-					this.instructions.get(i).loadInstruction(this);
-
-				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "ADD") {
-
-					this.instructions.get(i).addInstruction(this);
-
-				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "SUB") {
-
-					this.instructions.get(i).subInstruction(this);
-
-				} else if(this.instructions.get(this.otherRegisters[0]).instruction == "CMP") {
-
-					this.instructions.get(i).cmpInstruction(this);
-
+				this.table.get(i).add("");				// dynamically adds another cell
+				this.otherRegisters[this.PC] = i;		// points the pc to appropriate index, to change so that it will point to executing instruction
+				
+				// will not continue if not instruction's turn to start the instruction
+				if(this.cpuCycle < i){
+					continue;
 				}
-				this.otherRegisters[0]++;
+
+				// executed depending on the instruction
+				switch(this.instructions.get(i).instruction) {
+					case "LOAD":	this.instructions.get(i).loadInstruction(this);
+									break;
+					case "ADD":		this.instructions.get(i).addInstruction(this);
+									break;
+					case "SUB":		this.instructions.get(i).subInstruction(this);
+									break;
+					case "CMP":		this.instructions.get(i).cmpInstruction(this);
+									break;
+				}
 			}
 
+			this.otherRegisters[this.PC] = 0;
+
+			// temporary break, to add checker if all instruction is done
+			if(this.cpuCycle == 4) break;
 			this.cpuCycle++;
+
+		}
+
+		// temporarily prints the table for checking
+		for(i=0;i<this.table.size();i++) {
+			System.out.println(this.table.get(i));
 		}
 	}
 }

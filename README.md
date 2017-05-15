@@ -8,4 +8,4 @@ The simple computer supports a 5-stage pipeline consisting of a Fetch, Decode, E
 
 How to compile and run: (make sure you are in /cmsc132-amrs)
 javac -d ../bin *.java
-java -cp src Main
+java -cp ../bin Main

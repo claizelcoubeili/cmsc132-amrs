@@ -16,7 +16,7 @@ public class AMRS {
 	HashMap<String,String> patterns = new HashMap<String,String>();
 	ArrayList<ArrayList<String>> table = new ArrayList<ArrayList<String>>();
 
-	int[] integerRegisters; 
+	int[] integerRegisters = new int[32]; 
 	int[] otherRegisters = new int[6]; // PC, MAR, MBR, OF, NF, ZF 
 	int noOfInst;
 	int cpuCycle = 0;
@@ -28,13 +28,14 @@ public class AMRS {
 	final int ZF = 5;
 
 	public AMRS() {
-		this.readFile("../input/input.txt");
+		this.readFile("../input/TestCase002.txt");
 		this.noOfInst = this.rawInput.size();
 
 		this.loadRegex();
 		this.parseInput();
 		this.initializeTable();
 		this.execute();
+		this.printTable();
 	}
 
 	public void readFile(String path) {
@@ -112,37 +113,86 @@ public class AMRS {
 		while(true) {
 			for(i=0; i<this.noOfInst; i++) {
 				this.table.get(i).add("");				// dynamically adds another cell
-				this.otherRegisters[this.PC] = i;		// points the pc to appropriate index, to change so that it will point to executing instruction
 				
 				// will not continue if not instruction's turn to start the instruction
 				if(this.cpuCycle < i){
 					continue;
 				}
 
-				// executed depending on the instruction
-				switch(this.instructions.get(i).instruction) {
-					case "LOAD":	this.instructions.get(i).loadInstruction(this);
-									break;
-					case "ADD":		this.instructions.get(i).addInstruction(this);
-									break;
-					case "SUB":		this.instructions.get(i).subInstruction(this);
-									break;
-					case "CMP":		this.instructions.get(i).cmpInstruction(this);
-									break;
+				if(!this.instructions.get(i).done) {
+					// executed depending on the instruction
+					switch(this.instructions.get(i).instruction) {
+						case "LOAD":	this.instructions.get(i).loadInstruction(this, i);
+										break;
+						case "ADD":		this.instructions.get(i).addInstruction(this, i);
+										break;
+						case "SUB":		this.instructions.get(i).subInstruction(this, i);
+										break;
+						case "CMP":		this.instructions.get(i).cmpInstruction(this, i);
+										break;
+					}
 				}
 			}
 
-			this.otherRegisters[this.PC] = 0;
-
-			// temporary break, to add checker if all instruction is done
-			if(this.cpuCycle == 4) break;
+			printRegisters();
 			this.cpuCycle++;
-
+			if(checkDone()) break;
+			// if(cpuCycle == 20) break;
+			// System.out.println("=================");
 		}
 
-		// temporarily prints the table for checking
-		for(i=0;i<this.table.size();i++) {
-			System.out.println(this.table.get(i));
+	}
+
+	public Boolean checkDone() {
+		boolean flag = true;
+
+		for(int i=0; i<this.instructions.size(); i++) {
+			if(this.instructions.get(i).done == true) continue;
+			else {
+				flag = false;
+				break;
+			}
+		}
+
+		return flag;
+
+	}
+
+	public void printRegisters() {
+		System.out.println("\n================================================================================");
+		System.out.println("\n\t\tClock Cycle "+(cpuCycle+1));
+		System.out.println("Integer Registers: ");
+		for(int i=0; i<this.integerRegisters.length; i++) {
+			System.out.print("R"+i+"\t");
+		}
+		System.out.println();
+		for(int i=0; i<this.integerRegisters.length; i++) {
+			System.out.print(this.integerRegisters[i]+"\t");
+		}
+
+		System.out.println("\n\nOther Registers: ");
+		System.out.println("PC\tMAR\tMBR\tOF\tNF\tZF\t");
+		for(int i=0; i<this.otherRegisters.length; i++) {
+			System.out.print(this.otherRegisters[i]+"\t");
+		}
+		System.out.println();
+		System.out.println("================================================================================\n");
+
+	}
+
+	public void printTable() {
+		
+		System.out.print("\nInstruction\t");
+		for(int i=0; i<this.cpuCycle; i++) {
+			System.out.print((i+1)+"\t");
+		}
+		System.out.println("\n");
+		for(int i=0; i<this.table.size(); i++){
+			System.out.print(this.rawInput.get(i)+"\t");
+			for(int j=0; j<this.table.get(i).size(); j++) {
+				System.out.print(this.table.get(i).get(j)+"\t");
+			}
+			System.out.println();
 		}
 	}
 }
